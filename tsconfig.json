@@ -10,5 +10,9 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
-  "files": ["src/index.tsx", "src/DataTree.tsx"]
+  "files": [
+    "src/index.tsx",
+    "src/DataTree.tsx",
+    "src/uiComponents.tsx"
+  ]
 }

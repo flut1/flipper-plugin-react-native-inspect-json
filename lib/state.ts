@@ -31,7 +31,7 @@ function generateObjectState(
     json: Record<string, unknown>,
     subscriptions: Subscriptions
 ): StateValueObject {
-    const keys = Object.keys(json);
+    const keys = Object.getOwnPropertyNames(json);
 
     const result: StateValueObject = {
         type: 'object',
@@ -65,7 +65,7 @@ export function generateState(
         case "function": {
             let code = json.toString().replace(/\s+/g, ' ');
             if (code.length > 18) {
-                code = `${code.substring(0, 15)}...`;
+                code = `${code.substring(0, 40)}...`;
             }
             return {
                 type: 'function',
