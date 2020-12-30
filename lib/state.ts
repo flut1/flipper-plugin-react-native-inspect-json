@@ -6,6 +6,7 @@ import {
     isObjectSubscriptions
 } from "./types";
 import fromEntries from 'object.fromentries';
+import isEqual from 'lodash.isequal';
 
 function generateArrayState(
     json: Array<unknown>,
@@ -87,24 +88,5 @@ export function generateState(
 }
 
 export function stateIsEqual(a: State, b: State): boolean {
-    const typeofA = typeof a;
-
-    if (typeofA !== typeof b) {
-        return false;
-    }
-
-    switch (typeofA) {
-        case "object": {
-            if (a === null) {
-                return b === null;
-            }
-            if (Array.isArray(a)) {
-                return Array.isArray(b) && a.every((val, index) => stateIsEqual(val, b[index]));
-            }
-
-            return !Array.isArray(b) && Object.keys(a).every(key => stateIsEqual((a as any)[key], (b as any)[key]));
-        }
-        default:
-            return a === b;
-    }
+    return isEqual(a, b);
 }

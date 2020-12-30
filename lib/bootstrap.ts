@@ -59,7 +59,7 @@ export default function bootstrap(): PluginInstance {
             }
 
             instance.onConnect && instance.onConnect(subscriptions);
-            connection.send('init', { hello: 'world' });
+            connection.send('init', { hello: 'world'});
         },
         onDisconnect() {
             connection = null;
