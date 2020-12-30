@@ -51,7 +51,7 @@ function generateObjectState(
 
 export function generateState(
     json: unknown,
-    subscriptions: Subscriptions
+    subscriptions: Subscriptions,
 ): State {
     switch(typeof json) {
         case "boolean":

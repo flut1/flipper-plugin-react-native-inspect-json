@@ -1,4 +1,4 @@
-import React, {FunctionComponent, useState, useEffect, useRef} from 'react';
+import React, {FunctionComponent, useState, useEffect, useRef, useMemo} from 'react';
 import {styled} from 'flipper-plugin';
 import {State} from "../lib/types";
 import {TreeRow, SubTree, ObjectIndicator, Value, Type} from "./uiComponents";
@@ -31,10 +31,40 @@ const SHORT_TYPES = {
 
 const DataTree: FunctionComponent<Props> = ({ state, name, path = '', isRoot }) => {
     const [hasExpanded, setHasExpanded] = useState(false);
-    const initialExpanded = useRef(typeof state === 'object' && state !== null && 'values' in state);
+
+    const childValues = useMemo(() => {
+        if (typeof state !== 'object' || state === null || !('values' in state) || !state.values) {
+            return null;
+        }
+
+        if (state.type === 'array') {
+            return state.values.map((value, index) => ({
+                state: value,
+                key: index,
+                name: `[${index}]`,
+                path: `${path}.${index}`,
+            })) as Array<Required<Props> & { key: any }>;
+        }
+
+        const props = Object.entries(state.values)
+            .map(([key, value]) => ({
+                state: value,
+                key,
+                name: key,
+                path: `${path}.${key}`,
+            })) as Array<Required<Props> & { key: any }>;
+
+        props.sort((a, b) => {
+            return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+        });
+
+        return props;
+    }, [state]);
+
+    const initialExpanded = useRef(!!childValues);
 
     useEffect(() => {
-        if (typeof state === 'object' && state !== null && 'values' in state && !initialExpanded.current) {
+        if (!!childValues && !initialExpanded.current) {
             setHasExpanded(true);
         }
     }, [state]);
@@ -51,63 +81,22 @@ const DataTree: FunctionComponent<Props> = ({ state, name, path = '', isRoot }) 
 
     switch (state.type) {
         case "array":
-            return (
-                <>
-                    <TreeRow isExpanded={'values' in state} path={path} isRoot={isRoot}>
-                        <Type>
-                            <ObjectIndicator characters="[]">{state.length}</ObjectIndicator>
-                        </Type>
-                        { name && <Name>{name}</Name> }
-                    </TreeRow>
-                    {
-                        state.values && (
-                            <SubTree isRoot={isRoot} hasExpanded={hasExpanded}>
-                                {
-                                    state.values.map((value, index) => (
-                                        <DataTree
-                                            state={value}
-                                            key={index}
-                                            name={`[${index}]`}
-                                            path={`${path}.${index}`}
-                                        />
-                                    ))
-                                }
-                                {
-                                    !state.values.length && (
-                                        <TreeRow>
-                                            <Type>(empty array)</Type>
-                                        </TreeRow>
-                                    )
-                                }
-                            </SubTree>
-                        )
-                    }
-                </>
-            );
         case "object":
             return (
                 <>
-                    <TreeRow isExpanded={'values' in state} path={path} isRoot={isRoot}>
+                    <TreeRow isExpanded={!!childValues} path={path} isRoot={isRoot}>
                         <Type>
-                            <ObjectIndicator characters="{}">{state.numKeys}</ObjectIndicator>
+                            { state.type === "array" && <ObjectIndicator characters="[]">{state.length}</ObjectIndicator> }
+                            { state.type === "object" && <ObjectIndicator characters="{}">{state.numKeys}</ObjectIndicator> }
                         </Type>
-                        { name && <Name>{name}</Name> }
+                        {name && <Name>{name}</Name>}
                     </TreeRow>
                     {
-                        state.values && (
+                        childValues && (
                             <SubTree isRoot={isRoot} hasExpanded={hasExpanded}>
+                                {childValues.map(props => <DataTree {...props} />)}
                                 {
-                                    Object.entries(state.values).map(([key, value]) => (
-                                        <DataTree
-                                            state={value}
-                                            key={key}
-                                            name={key}
-                                            path={`${path}.${key}`}
-                                        />
-                                    ))
-                                }
-                                {
-                                    !Object.entries(state.values).length && (
+                                    !childValues.length && (
                                         <TreeRow>
                                             <Type>(empty array)</Type>
                                         </TreeRow>
@@ -119,13 +108,14 @@ const DataTree: FunctionComponent<Props> = ({ state, name, path = '', isRoot }) 
                 </>
             );
         case "function":
-            return (
-                <TreeRow isRoot={isRoot}>
-                    <Type>{SHORT_TYPES.function}</Type>
-                    { name && <Name>{name}</Name> }
-                    <Value>{state.code}</Value>
-                </TreeRow>
-            );
+            // todo: create option to show functions
+            // return (
+            //     <TreeRow isRoot={isRoot}>
+            //         <Type>{SHORT_TYPES.function}</Type>
+            //         { name && <Name>{name}</Name> }
+            //         <Value>{state.code}</Value>
+            //     </TreeRow>
+            // );
         case "unknown":
         default:
             return null;
