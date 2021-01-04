@@ -4,8 +4,8 @@ import debounce from "lodash.debounce";
 import throttle from "lodash.throttle";
 import {generateStateSegment, generateStateValue, getAtPath} from "./state";
 
-const SEND_SEGMENT_DEBOUNCE = 1000;
-const SEND_GLOBAL_THROTTLE = 300;
+const SEND_SEGMENT_DEBOUNCE = 500;
+const SEND_SEGMENT_MAX_WAIT = 1000;
 
 type OnSubscriptionsUpdateCallback = (subscriptions: Subscriptions) => any;
 type OnConnectCallback = (subscriptions: Subscriptions | null) => any;
@@ -16,7 +16,7 @@ export default class PluginClient {
     private $subscriptions: Subscriptions | null = null;
     private options: Options;
     private connection: Flipper.FlipperConnection | null = null;
-    private sendThrottled: PluginClient['send'];
+    // private sendThrottled: PluginClient['send'];
 
     public onConnect: OnConnectCallback = () => {};
     public onDisconnect: OnDisconnectCallback = () => {};
@@ -28,7 +28,7 @@ export default class PluginClient {
             includeNonEnumerableKeys: false,
             ...options,
         }
-        this.sendThrottled = throttle((method: string, data: any) => this.send(method, data), SEND_GLOBAL_THROTTLE);
+        // this.sendThrottled = throttle((method: string, data: any) => this.send(method, data), SEND_GLOBAL_THROTTLE);
 
         const client = this;
         addPlugin({
@@ -85,6 +85,7 @@ export default class PluginClient {
             this.debouncedSend[subscription] = debounce(
                 (newValue: StateSegment) => this.sendSegment(subscription, newValue),
                 SEND_SEGMENT_DEBOUNCE,
+                { maxWait: SEND_SEGMENT_MAX_WAIT }
             );
         }
         this.debouncedSend[subscription]!(segment);
@@ -97,6 +98,6 @@ export default class PluginClient {
     }
 
     private sendSegment(subscription: Subscription, segment: StateSegment) {
-        this.sendThrottled('updateSegment', { path: subscription, segment });
+        this.send('updateSegment', { path: subscription, segment });
     }
 }

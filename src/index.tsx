@@ -84,6 +84,13 @@ export function plugin(client: PluginClient<Events, Methods>) {
                     }
                 }
             });
+            localState.update(draft => {
+               for (const key of Object.keys(draft.data)) {
+                  if (key.startsWith(path)) {
+                      delete draft.data[key as keyof typeof draft];
+                  }
+               }
+            });
             if (localState.get().ready) {
                 sendSubscriptions();
             }
