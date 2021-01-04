@@ -1,9 +1,15 @@
 export type Subscription = string;
 export type Subscriptions = Array<Subscription>;
 
+export type ProcessPropertyResult = void | undefined | false | {
+    labels?: Array<string>;
+    hide?: boolean;
+};
+
 export type Options = {
     includeMethods: boolean;
     includeNonEnumerableKeys: boolean;
+    processProperty?: <TKey extends string>(object: { [K in TKey]: any }, key: TKey) => ProcessPropertyResult;
 }
 
 export type StateValueArray = {
@@ -44,7 +50,7 @@ export type StateValueObject = {
     numKeys: number;
 }
 
-export type StateValue =
+export type StateValue = (
     | StateValueArray
     | StateValueBoolean
     | StateValueFunction
@@ -52,7 +58,8 @@ export type StateValue =
     | StateValueNumber
     | StateValueObject
     | StateValueString
-    | StateValueUndefined;
+    | StateValueUndefined
+) & { labels?: Array<string>, hide?: boolean };
 
 export type StateSegmentArray = {
     type: 'array';

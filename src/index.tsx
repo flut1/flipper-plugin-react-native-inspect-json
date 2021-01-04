@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import {PluginClient, usePlugin, createState, useValue, Layout} from 'flipper-plugin';
 import type {State, Subscriptions, StateSegment} from "../lib/types";
 import DataTree from "./DataTree";

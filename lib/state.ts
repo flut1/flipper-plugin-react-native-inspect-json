@@ -1,4 +1,11 @@
-import {StateValue, StateSegment, Options, StateSegmentArray, StateSegmentObject, State} from "./types";
+import {
+    StateValue,
+    StateSegment,
+    Options,
+    StateSegmentArray,
+    StateSegmentObject,
+    ProcessPropertyResult
+} from "./types";
 import fromEntries from "object.fromentries";
 import get from 'lodash.get';
 
@@ -60,8 +67,30 @@ export function generateStateSegment(json: unknown, options: Options): StateSegm
         type: 'object',
         values: fromEntries(
             getKeys(json, options)
-                .map((key) => [key, generateStateValue((json as any)[key], options)])
-                .filter(_ => _)
+                .map((key) => {
+                    let preprocess: ProcessPropertyResult;
+
+                    if (options.processProperty) {
+                        preprocess = options.processProperty(json, key);
+                    }
+
+                    if (preprocess === false) {
+                        return null;
+                    }
+
+                    const stateValue = generateStateValue((json as any)[key], options);
+
+                    if (!stateValue) {
+                        return null;
+                    }
+
+                    if (typeof preprocess === 'object') {
+                        Object.assign(stateValue, preprocess);
+                    }
+
+                    return [key, stateValue];
+                })
+                .filter(_ => _) as Array<[string, StateValue]>
         ),
     } as StateSegmentObject;
 }
