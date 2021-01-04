@@ -1,19 +1,14 @@
+export type Subscription = string;
+export type Subscriptions = Array<Subscription>;
 
-export type NoSubscriptions = null;
-export type ObjectSubscriptions = { [name: string]: Subscriptions };
-
-export type Subscriptions = NoSubscriptions | ObjectSubscriptions;
-
-export function isObjectSubscriptions(subscriptions:Subscriptions): subscriptions is ObjectSubscriptions {
-    return typeof subscriptions === 'object' && subscriptions !== null;
+export type Options = {
+    includeMethods: boolean;
+    includeNonEnumerableKeys: boolean;
 }
-
-export type StateValuePrimitive = number | string | boolean | null;
 
 export type StateValueArray = {
     type: 'array';
     length: number;
-    values?: Array<State>;
 }
 
 export type StateValueFunction = {
@@ -21,40 +16,56 @@ export type StateValueFunction = {
     code: string;
 }
 
-/*
- * This is used if `typeof` returns something that we don't recognize
- */
-export type StateValueUnknown = {
-    type: 'unknown';
-}
-
 export type StateValueUndefined = {
     type: 'undefined';
+}
+
+export type StateValueNull = {
+    type: 'null';
+}
+
+export type StateValueString = {
+    type: 'string';
+    value: string;
+}
+
+export type StateValueNumber = {
+    type: 'number';
+    value: number;
+}
+
+export type StateValueBoolean = {
+    type: 'boolean';
+    value: boolean;
 }
 
 export type StateValueObject = {
     type: 'object';
     numKeys: number;
-    values?: Record<string, State>;
 }
 
-export type State =
+export type StateValue =
     | StateValueArray
-    | StateValueObject
-    | StateValuePrimitive
+    | StateValueBoolean
     | StateValueFunction
-    | StateValueUndefined
-    | StateValueUnknown;
+    | StateValueNull
+    | StateValueNumber
+    | StateValueObject
+    | StateValueString
+    | StateValueUndefined;
 
-// export type StateWithSubscriptions = {
-//     [K in keyof State]: State[K] extends StateValueArray | StateValueObject ?
-//         State[K] & { subscribed: boolean } : State[K];
-// }
-
-export type PluginInstance = {
-    readonly subscriptions: Subscriptions;
-    updateState(newState: State): void;
-    onSetSubscriptions: null | ((subscriptions: Subscriptions) => any);
-    onConnect: null | ((subscriptions: Subscriptions) => any);
-    onDisconnect: null | (() => any);
+export type StateSegmentArray = {
+    type: 'array';
+    values: Array<StateValue>;
 }
+
+export type StateSegmentObject = {
+    type: 'object';
+    values: { [key: string]: StateValue };
+}
+
+export type StateSegment =
+    | StateSegmentArray
+    | StateSegmentObject;
+
+export type State = Record<Subscription, StateSegment>;

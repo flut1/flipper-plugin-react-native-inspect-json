@@ -1,7 +1,6 @@
 import React, {FunctionComponent, useContext, useMemo} from 'react';
 import {keyframes} from '@emotion/react';
 import {styled} from 'flipper-plugin';
-import TreeContext from "./TreeContext";
 
 export const TreeRowWrapper = styled.div`
   margin: 0;
@@ -11,6 +10,8 @@ export const TreeRowWrapper = styled.div`
   cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
   background: none;
   border: none;
+  text-align: left;
+  width: 100%;
   align-items: flex-start;
 `;
 
@@ -19,6 +20,7 @@ export const ExpandIndicator = styled.div`
   margin-left: 5px;
   padding-top: 4px;
   color: #3d35a2;
+  margin-right: auto;
 `;
 
 export const RowLine = styled.div`
@@ -31,15 +33,15 @@ export const RowLine = styled.div`
 
 export const TreeRow: FunctionComponent<{
     isExpanded?: boolean,
-    path?: string,
     isRoot?: boolean,
-}> = ({ path, isExpanded, children, isRoot }) => {
-    const { subscribe, unsubscribe } = useContext(TreeContext);
-
-    const isExpandable = !isRoot && typeof isExpanded === 'boolean';
-    const onClick = isExpandable ? (() => {
-        (isExpanded ? unsubscribe : subscribe)(path!);
-    }) : undefined;
+    onClick?: () => void;
+}> = ({
+    onClick,
+    isExpanded,
+    children,
+    isRoot,
+}) => {
+    const isExpandable = !!onClick;
 
     return (
         <TreeRowWrapper as={isExpandable ? 'button' : 'div'} onClick={onClick}>
@@ -61,7 +63,7 @@ const appear = keyframes`
   }
 `;
 
-const SubTreeEl: FunctionComponent<{ className?: string, hasExpanded?: boolean, isRoot?: boolean }> =
+const SubTreeEl: FunctionComponent<{ className?: string, hasAppeared?: boolean, isRoot?: boolean }> =
     ({ className, children }) => <div className={className}>{children}</div>;
 
 export const SubTree = styled(SubTreeEl)`
@@ -70,7 +72,7 @@ export const SubTree = styled(SubTreeEl)`
   border-left: 1px dashed #ccc;
   overflow: hidden;
   
-  animation: ${({ hasExpanded }) => hasExpanded ? appear : 'none'} 0.3s ease-out backwards;
+  animation: ${({ hasAppeared }) => hasAppeared ? appear : 'none'} 0.3s ease-out backwards;
 `;
 
 const ObjectIndicatorWrapper: FunctionComponent<{className?: string, characters: string}> = ({ className, children }) => (
@@ -103,7 +105,7 @@ export const ContentWrapper = styled.div`
 `;
 
 const ValueWrapper = styled.div`
-  flex: 1 0 0;
+  flex: 0 1 auto;
   overflow: hidden;
   padding: 5px 0;
   margin: 0 10px;
@@ -120,9 +122,16 @@ export const Type = styled.div`
   text-align: left;
 `;
 
-export const Value: FunctionComponent = ({ children }) => {
+export const Name = styled.div`
+  flex: 0 0 auto;
+  padding: 5px 0;
+`;
+
+export const Value: FunctionComponent<{
+    type: 'boolean' | 'string' | 'number' | 'null' | 'function' | 'undefined'
+}> = ({ children, type }) => {
     let color: string = '#000';
-    switch (typeof children) {
+    switch (type) {
         case "boolean":
             color = '#923237';
             break;
@@ -132,13 +141,16 @@ export const Value: FunctionComponent = ({ children }) => {
         case "string":
             color = '#e09e1b';
             break;
+        case "function":
+            color = '#666';
+            break;
         default:
             break;
     }
 
     return (
         <ValueWrapper style={{color}}>
-            {JSON.stringify(children)}
+            {children}
         </ValueWrapper>
     );
 };

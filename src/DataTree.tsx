@@ -1,125 +1,80 @@
-import React, {FunctionComponent, useState, useEffect, useRef, useMemo} from 'react';
-import {styled} from 'flipper-plugin';
-import {State} from "../lib/types";
-import {TreeRow, SubTree, ObjectIndicator, Value, Type} from "./uiComponents";
+import React, {FunctionComponent, useMemo, Fragment} from 'react';
+import {State, Subscriptions, StateValue} from "../lib/types";
+import {TreeRow, Type} from "./uiComponents";
+import DataTreeValue from "./DataTreeValue";
 
 interface Props {
     state: State;
-    name?: string;
     path?: string;
-    isRoot?: boolean;
+    subscriptions: Subscriptions;
+    subscribe: (path: string) => void;
+    unsubscribe: (path: string) => void;
 }
 
-const NameWrapper = styled.div({
-    flex: '0 0 auto',
-    paddingTop: 5,
-    paddingBottom: 5,
-});
+const DataTree: FunctionComponent<Props> = ({ state, path = '', subscriptions, subscribe, unsubscribe }) => {
+    const stateAtPath = state[path];
 
-const Name: FunctionComponent = ({ children }) => (
-    <NameWrapper>
-        {children}
-    </NameWrapper>
-);
-
-const SHORT_TYPES = {
-    boolean: 'bool',
-    string: 'string',
-    function: 'func',
-    number: 'num'
-}
-
-const DataTree: FunctionComponent<Props> = ({ state, name, path = '', isRoot }) => {
-    const [hasExpanded, setHasExpanded] = useState(false);
-
-    const childValues = useMemo(() => {
-        if (typeof state !== 'object' || state === null || !('values' in state) || !state.values) {
-            return null;
-        }
-
-        if (state.type === 'array') {
-            return state.values.map((value, index) => ({
-                state: value,
-                key: index,
-                name: `[${index}]`,
-                path: `${path}.${index}`,
-            })) as Array<Required<Props> & { key: any }>;
-        }
-
-        const props = Object.entries(state.values)
-            .map(([key, value]) => ({
-                state: value,
-                key,
-                name: key,
-                path: `${path}.${key}`,
-            })) as Array<Required<Props> & { key: any }>;
-
-        props.sort((a, b) => {
-            return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
-        });
-
-        return props;
-    }, [state]);
-
-    const initialExpanded = useRef(!!childValues);
-
-    useEffect(() => {
-        if (!!childValues && !initialExpanded.current) {
-            setHasExpanded(true);
-        }
-    }, [state]);
-
-    if (typeof state !== 'object' || state === null) {
+    if (!stateAtPath) {
         return (
-            <TreeRow isRoot={isRoot}>
-                <Type>{ (SHORT_TYPES as any)[typeof state] }</Type>
-                { name && <Name>{name}</Name> }
-                <Value>{ state }</Value>
+            <TreeRow>
+                <Type>waiting for device to send...</Type>
             </TreeRow>
-        );
+        )
     }
 
-    switch (state.type) {
-        case "array":
-        case "object":
-            return (
-                <>
-                    <TreeRow isExpanded={!!childValues} path={path} isRoot={isRoot}>
-                        <Type>
-                            { state.type === "array" && <ObjectIndicator characters="[]">{state.length}</ObjectIndicator> }
-                            { state.type === "object" && <ObjectIndicator characters="{}">{state.numKeys}</ObjectIndicator> }
-                        </Type>
-                        {name && <Name>{name}</Name>}
-                    </TreeRow>
-                    {
-                        childValues && (
-                            <SubTree isRoot={isRoot} hasExpanded={hasExpanded}>
-                                {childValues.map(props => <DataTree {...props} />)}
-                                {
-                                    !childValues.length && (
-                                        <TreeRow>
-                                            <Type>(empty array)</Type>
-                                        </TreeRow>
-                                    )
-                                }
-                            </SubTree>
-                        )
-                    }
-                </>
-            );
-        case "function":
-            // todo: create option to show functions
-            // return (
-            //     <TreeRow isRoot={isRoot}>
-            //         <Type>{SHORT_TYPES.function}</Type>
-            //         { name && <Name>{name}</Name> }
-            //         <Value>{state.code}</Value>
-            //     </TreeRow>
-            // );
-        case "unknown":
-        default:
-            return null;
+    const entries = useMemo(() => {
+        if (stateAtPath.type === 'array') {
+            return stateAtPath.values.map((value, index) => ({
+                name: `[${index}]`,
+                path: `${path === '.' ? '' : path}[${index}]`,
+                value,
+            }));
+        }
+
+        return Object.entries(stateAtPath.values).map(([key, value]) => ({
+            name: key,
+            path: path === '.' ? key : `${path}.${key}`,
+            value,
+        }));
+    }, [stateAtPath]);
+
+    if (!entries.length) {
+        return (
+            <TreeRow>
+                <Type>(empty)</Type>
+            </TreeRow>
+        )
     }
+
+    return (
+        <>
+            {entries.map((entry) => {
+                const isExpanded = subscriptions.includes(entry.path);
+                const onClick = isExpanded ? () => unsubscribe(entry.path) : () => subscribe(entry.path);
+
+                return (
+                    <Fragment key={entry.path}>
+                        <DataTreeValue
+                            value={entry.value}
+                            name={entry.name}
+                            isExpanded={isExpanded}
+                            onClick={onClick}
+                        >
+                            { ['object', 'array'].includes(entry.value.type) && (
+                                <DataTree
+                                    unsubscribe={unsubscribe}
+                                    subscribe={subscribe}
+                                    state={state}
+                                    subscriptions={subscriptions}
+                                    path={entry.path}
+                                />
+                            )}
+                        </DataTreeValue>
+                    </Fragment>
+                );
+            })}
+        </>
+    );
 }
 
 export default DataTree;

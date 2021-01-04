@@ -11,5 +11,5 @@
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true
   },
-  "files": ["lib/bootstrap.ts", "lib/state.ts", "lib/types.ts"]
+  "files": ["lib/bootstrap.ts", "lib/state.ts", "lib/types.ts", "lib/PluginClient.ts"]
 }

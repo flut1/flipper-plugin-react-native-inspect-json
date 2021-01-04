@@ -1,9 +1,8 @@
 import React, {useMemo} from 'react';
 import {PluginClient, usePlugin, createState, useValue, Layout} from 'flipper-plugin';
-import type {State, Subscriptions, ObjectSubscriptions} from "../lib/types";
+import type {State, Subscriptions, StateSegment} from "../lib/types";
 import DataTree from "./DataTree";
-import TreeContext, {TreeContextValue} from "./TreeContext";
-import {ContentWrapper} from "./uiComponents";
+import {ContentWrapper, TreeRow, Name, SubTree} from "./uiComponents";
 import {Alert} from "antd";
 
 type PersistentData = {
@@ -16,34 +15,34 @@ type LocalState = {
 }
 
 type Events = {
-    state: State;
+    updateSegment: { path: string, segment: StateSegment };
     init: { hello: string };
 };
 
 type Methods = {
-    setSubscriptions(newSubscriptions: Subscriptions): Promise<{ ack: true }>,
+    setSubscriptions(newSubscriptions: { subscriptions: Subscriptions }): Promise<{ ack: true }>,
 }
 
 export function plugin(client: PluginClient<Events, Methods>) {
     const persistentData = createState<PersistentData>({
-        subscriptions: {}
+        subscriptions: ['.']
     }, {persist: `data_${client.appId}`});
     const localState = createState<LocalState>({
-        data: null,
+        data: {},
         ready: false,
     });
 
     client.onConnect(() => {
-        client.onMessage('state', newState => {
+        client.onMessage('updateSegment', ({ path, segment }) => {
             localState.update(draft => {
-                draft.data = newState;
+                draft.data[path] = segment;
             });
         });
         client.onMessage('init', () => {
             localState.update(draft => {
                 draft.ready = true;
             });
-            client.send('setSubscriptions', persistentData.get().subscriptions);
+            client.send('setSubscriptions', persistentData.get());
         });
     });
 
@@ -55,50 +54,34 @@ export function plugin(client: PluginClient<Events, Methods>) {
 
     client.onActivate(() => {
         if (localState.get().ready) {
-            client.send('setSubscriptions', persistentData.get().subscriptions);
+            client.send('setSubscriptions', persistentData.get());
         }
     });
 
     return {
         localState,
+        persistentData,
         subscribe(path: string) {
-            const segments = path.replace(/^\./, '').split('.');
             persistentData.update(draft => {
-                let current: ObjectSubscriptions = draft.subscriptions || {};
-
-                segments.forEach(segment => {
-                    current[segment] = current[segment] || {};
-                    current = current[segment] as ObjectSubscriptions;
-                });
+                if (!draft.subscriptions.includes(path)) {
+                    draft.subscriptions.push(path);
+                }
             });
 
             if (localState.get().ready) {
-                client.send('setSubscriptions', persistentData.get().subscriptions);
+                client.send('setSubscriptions', persistentData.get());
             }
         },
         unsubscribe(path: string) {
-            const segments = path.replace(/^\./, '').split('.');
             persistentData.update(draft => {
-                let current: ObjectSubscriptions = draft.subscriptions || {};
-
-                const finalSegment = segments.pop();
-                if (!finalSegment) {
-                    draft.subscriptions = null;
-                    return;
-                }
-
-                for (const segment of segments) {
-                    if (!current[segment]) {
-                        return;
+                for (let i=draft.subscriptions.length - 1; i >= 0; i--) {
+                    if (draft.subscriptions[i].startsWith(path)) {
+                        draft.subscriptions.splice(i, 1);
                     }
-                    current = current[segment] as ObjectSubscriptions;
-                }
-                if (current) {
-                    delete current[finalSegment];
                 }
             });
             if (localState.get().ready) {
-                client.send('setSubscriptions', persistentData.get().subscriptions);
+                client.send('setSubscriptions', persistentData.get());
             }
         }
     };
@@ -107,30 +90,38 @@ export function plugin(client: PluginClient<Events, Methods>) {
 export function Component() {
     const instance = usePlugin(plugin);
     const { data, ready } = useValue(instance.localState);
-
-    const contextValue = useMemo<TreeContextValue>(
-        () => ({subscribe: instance.subscribe, unsubscribe: instance.unsubscribe}),
-        [instance.subscribe, instance.unsubscribe]
-    );
+    const { subscriptions } = useValue(instance.persistentData);
 
     return (
-        <TreeContext.Provider value={contextValue}>
-            <Layout.ScrollContainer vertical>
-                <ContentWrapper>
-
-                    {
-                        ready && !data && (
-                            <Alert message="Waiting for app to send state" type="info" />
-                        )
-                    }
-                    {
-                        !ready && !data && (
-                            <Alert message="Waiting for app to connect to plugin" type="info" />
-                        )
-                    }
-                    { data && <DataTree state={data} name="data" isRoot /> }
-                </ContentWrapper>
-            </Layout.ScrollContainer>
-        </TreeContext.Provider>
+        <Layout.ScrollContainer vertical>
+            <ContentWrapper>
+                {
+                    ready && !data['.'] && (
+                        <Alert message="Waiting for app to send state" type="info" />
+                    )
+                }
+                {
+                    !ready && (
+                        <Alert message="Waiting for app to connect to plugin" type="info" />
+                    )
+                }
+                { data['.'] && (
+                    <>
+                        <TreeRow isRoot isExpanded>
+                            <Name>data</Name>
+                        </TreeRow>
+                        <SubTree isRoot>
+                            <DataTree
+                                state={data}
+                                subscriptions={subscriptions}
+                                path="."
+                                subscribe={instance.subscribe}
+                                unsubscribe={instance.unsubscribe}
+                            />
+                        </SubTree>
+                    </>
+                ) }
+            </ContentWrapper>
+        </Layout.ScrollContainer>
     );
 }
