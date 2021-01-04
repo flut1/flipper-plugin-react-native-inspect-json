@@ -1,6 +1,8 @@
 import React, {FunctionComponent, useState, useRef, useEffect} from "react";
 import {StateValue} from "../lib/types";
-import {TreeRow, SubTree, Type, Value, Name, ObjectIndicator} from "./uiComponents";
+import {TreeRow, SubTree, Type, Value, Name, ObjectIndicator, Label} from "./uiComponents";
+import {usePlugin, useValue} from "flipper-plugin";
+import {plugin} from "./index";
 
 interface Props {
     value: StateValue;
@@ -15,6 +17,27 @@ const SHORT_TYPES = {
     function: 'func',
     number: 'num'
 }
+
+const Labels: FunctionComponent<{ value: StateValue }> = ({
+  value: { labels = [] }
+}) => {
+    const { persistentData } = usePlugin(plugin);
+    const { showLabels } = useValue(persistentData);
+
+    if (!showLabels) {
+        return null;
+    }
+
+    return (
+        <>
+            {
+                labels.map((label, index) => (
+                    <Label mark key={index}>{label}</Label>
+                ))
+            }
+        </>
+    );
+};
 
 const DataTreeValue: FunctionComponent<Props> = ({ value, name, isExpanded, onClick, children }) => {
     const [hasExpanded, setHasExpanded] = useState(false);
@@ -33,6 +56,7 @@ const DataTreeValue: FunctionComponent<Props> = ({ value, name, isExpanded, onCl
                     <Type>{SHORT_TYPES.function}</Type>
                     { name && <Name>{name}</Name> }
                     <Value type={value.type}>{value.code}</Value>
+                    <Labels value={value} />
                 </TreeRow>
             );
         case "null":
@@ -40,6 +64,7 @@ const DataTreeValue: FunctionComponent<Props> = ({ value, name, isExpanded, onCl
                 <TreeRow isExpanded={isExpanded}>
                     { name && <Name>{name}</Name> }
                     <Value type={value.type}>null</Value>
+                    <Labels value={value} />
                 </TreeRow>
             );
         case "undefined":
@@ -57,6 +82,7 @@ const DataTreeValue: FunctionComponent<Props> = ({ value, name, isExpanded, onCl
                     <Type>{ SHORT_TYPES[value.type] }</Type>
                     { name && <Name>{name}</Name> }
                     <Value type={value.type}>{ JSON.stringify(value.value) }</Value>
+                    <Labels value={value} />
                 </TreeRow>
             );
         case "array":
@@ -67,6 +93,7 @@ const DataTreeValue: FunctionComponent<Props> = ({ value, name, isExpanded, onCl
                             <ObjectIndicator characters="[]">{value.length}</ObjectIndicator>
                         </Type>
                         {name && <Name>{name}</Name>}
+                        <Labels value={value} />
                     </TreeRow>
 
                     { isExpanded && (
@@ -84,6 +111,7 @@ const DataTreeValue: FunctionComponent<Props> = ({ value, name, isExpanded, onCl
                             <ObjectIndicator characters="{}">{value.numKeys}</ObjectIndicator>
                         </Type>
                         {name && <Name>{name}</Name>}
+                        <Labels value={value} />
                     </TreeRow>
 
                     { isExpanded && (

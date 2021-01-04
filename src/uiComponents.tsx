@@ -1,7 +1,7 @@
 import React, {FunctionComponent} from 'react';
 import {keyframes} from '@emotion/react';
 import {styled, theme} from 'flipper-plugin';
-import {Button} from "antd";
+import {Button, Typography} from "antd";
 
 export const ResetButton = styled(Button)`
   margin-left: 1rem;
@@ -130,6 +130,11 @@ export const Type = styled.div`
 export const Name = styled.div`
   flex: 0 0 auto;
   padding: 5px 0;
+`;
+
+export const Label = styled(Typography.Text)`
+  flex: 0 0 auto;
+  padding: 5px;
 `;
 
 export const Value: FunctionComponent<{
