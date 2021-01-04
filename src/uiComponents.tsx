@@ -1,6 +1,11 @@
-import React, {FunctionComponent, useContext, useMemo} from 'react';
+import React, {FunctionComponent} from 'react';
 import {keyframes} from '@emotion/react';
-import {styled} from 'flipper-plugin';
+import {styled, theme} from 'flipper-plugin';
+import {Button} from "antd";
+
+export const ResetButton = styled(Button)`
+  margin-left: 1rem;
+`
 
 export const TreeRowWrapper = styled.div`
   margin: 0;

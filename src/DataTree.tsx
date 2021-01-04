@@ -2,27 +2,25 @@ import React, {FunctionComponent, useMemo, Fragment} from 'react';
 import {State, Subscriptions, StateValue} from "../lib/types";
 import {TreeRow, Type} from "./uiComponents";
 import DataTreeValue from "./DataTreeValue";
+import {usePlugin, useValue} from "flipper-plugin";
+import {plugin} from "./index";
 
 interface Props {
     state: State;
     path?: string;
     subscriptions: Subscriptions;
-    subscribe: (path: string) => void;
-    unsubscribe: (path: string) => void;
 }
 
-const DataTree: FunctionComponent<Props> = ({ state, path = '', subscriptions, subscribe, unsubscribe }) => {
+const DataTree: FunctionComponent<Props> = ({ state, path = '', subscriptions }) => {
+    const { subscribe, unsubscribe, persistentData } = usePlugin(plugin);
+    const { showHidden } = useValue(persistentData);
     const stateAtPath = state[path];
 
-    if (!stateAtPath) {
-        return (
-            <TreeRow>
-                <Type>waiting for device to send...</Type>
-            </TreeRow>
-        )
-    }
-
     const entries = useMemo(() => {
+        if (!stateAtPath) {
+            return null;
+        }
+
         if (stateAtPath.type === 'array') {
             return stateAtPath.values.map((value, index) => ({
                 name: `[${index}]`,
@@ -31,12 +29,24 @@ const DataTree: FunctionComponent<Props> = ({ state, path = '', subscriptions, s
             }));
         }
 
-        return Object.entries(stateAtPath.values).map(([key, value]) => ({
+        const props = Object.entries(stateAtPath.values).map(([key, value]) => ({
             name: key,
             path: path === '.' ? key : `${path}.${key}`,
             value,
         }));
+        props.sort((a, b) => {
+            return (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0;
+        });
+        return props;
     }, [stateAtPath]);
+
+    if (!entries) {
+        return (
+            <TreeRow>
+                <Type>waiting for device to send...</Type>
+            </TreeRow>
+        )
+    }
 
     if (!entries.length) {
         return (
@@ -52,6 +62,10 @@ const DataTree: FunctionComponent<Props> = ({ state, path = '', subscriptions, s
                 const isExpanded = subscriptions.includes(entry.path);
                 const onClick = isExpanded ? () => unsubscribe(entry.path) : () => subscribe(entry.path);
 
+                if (!showHidden && entry.value.hide) {
+                    return null;
+                }
+
                 return (
                     <Fragment key={entry.path}>
                         <DataTreeValue
@@ -62,8 +76,6 @@ const DataTree: FunctionComponent<Props> = ({ state, path = '', subscriptions, s
                         >
                             { ['object', 'array'].includes(entry.value.type) && (
                                 <DataTree
-                                    unsubscribe={unsubscribe}
-                                    subscribe={subscribe}
                                     state={state}
                                     subscriptions={subscriptions}
                                     path={entry.path}
