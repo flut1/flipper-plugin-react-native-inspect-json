@@ -8,9 +8,23 @@ The plugin has been created for usage with a global MobX store, of which you can
 also work with other kinds of objects. Keep in mind that this plugin does not track changes to the object and send
 updates to Flipper accordingly. You would have to implement your own change tracking that calls `updateState()`.
 
+## Installation
+In Flipper:
+
+- Open Flipper
+- 
+
+In your react-native app:
+
+```typescript
+yarn add flipper-plugin-react-native-inspect-json
+```
+
 ## Example -- TypeScript and MobX
 
 ```typescript
+import bootstrap from 'flipper-plugin-react-native-inspect-json/lib/bootstrap';
+import type { Subscriptions } from 'flipper-plugin-react-native-inspect-json/lib/types';
 import {comparer, reaction} from 'mobx';
 import {IReactionDisposer} from 'mobx/lib/internal';
 
