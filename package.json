@@ -13,7 +13,7 @@
     "store"
   ],
   "bugs": {
-    "email": "https://github.com/flut1/flipper-plugin-react-native-inspect-json/issues"
+    "url": "https://github.com/flut1/flipper-plugin-react-native-inspect-json/issues"
   },
   "repository": {
     "type": "git",
