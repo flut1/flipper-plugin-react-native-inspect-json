@@ -1,9 +1,9 @@
 import React, {FunctionComponent, useMemo, Fragment} from 'react';
-import {State, Subscriptions, StateValue} from "../lib/types";
+import {usePlugin, useValue} from "flipper-plugin";
+import type {State, Subscriptions} from "../lib/types";
 import {TreeRow, Type} from "./uiComponents";
 import DataTreeValue from "./DataTreeValue";
-import {usePlugin, useValue} from "flipper-plugin";
-import {plugin} from "./index";
+import plugin from './plugin';
 
 interface Props {
     state: State;

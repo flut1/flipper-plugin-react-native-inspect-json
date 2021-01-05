@@ -1,7 +1,7 @@
 import React, {FunctionComponent} from "react";
 import {styled, theme, useValue, usePlugin} from "flipper-plugin";
 import {Select, Button, Switch} from "antd";
-import {plugin} from "./index";
+import plugin from './plugin';
 
 const ToolbarWrapper = styled.div`
     min-height: 42px;

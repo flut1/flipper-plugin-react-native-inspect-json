@@ -1,4 +1,4 @@
-import {Subscriptions, State, StateSegment} from "../lib/types";
+import type {Subscriptions, State, StateSegment} from "../lib/types";
 
 export type RuntimeOptions = {
     showHidden: boolean;

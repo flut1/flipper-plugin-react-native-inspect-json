@@ -1,9 +1,9 @@
 import React, {FunctionComponent, useState, useRef, useEffect} from "react";
-import {StateValue} from "../lib/types";
-import {TreeRow, SubTree, Type, Value, Name, ObjectIndicator, Label} from "./uiComponents";
 import {usePlugin, useValue} from "flipper-plugin";
-import {plugin} from "./index";
 import {message} from "antd";
+import type {StateValue} from "../lib/types";
+import {TreeRow, SubTree, Type, Value, Name, ObjectIndicator, Label} from "./uiComponents";
+import plugin from './plugin';
 
 interface Props {
     value: StateValue;
