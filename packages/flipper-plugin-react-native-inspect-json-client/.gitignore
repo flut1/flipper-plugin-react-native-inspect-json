@@ -1,0 +1,6 @@
+# shared with .npmignore
+.idea
+node_modules
+
+# .gitignore only
+dist

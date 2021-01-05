@@ -1,0 +1,7 @@
+# shared with .gitignore
+.idea
+node_modules
+
+# .npmignore only
+src
+tsconfig.json

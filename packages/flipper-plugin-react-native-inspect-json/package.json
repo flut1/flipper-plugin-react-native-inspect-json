@@ -1,0 +1,55 @@
+{
+  "$schema": "https://fbflipper.com/schemas/plugin-package/v2.json",
+  "name": "flipper-plugin-react-native-inspect-json",
+  "version": "0.0.5",
+  "keywords": [
+    "flipper-plugin",
+    "react-native",
+    "inspect",
+    "data",
+    "json",
+    "tree",
+    "mobx",
+    "store"
+  ],
+  "bugs": {
+    "url": "https://github.com/flut1/flipper-plugin-react-native-inspect-json/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flut1/flipper-plugin-react-native-inspect-json"
+  },
+  "license": "MIT",
+  "main": "dist/bundle.js",
+  "scripts": {
+    "build": "flipper-pkg bundle",
+    "lint": "flipper-pkg lint",
+    "prepack": "flipper-pkg lint && flipper-pkg bundle",
+    "test": "jest",
+    "watch": "flipper-pkg bundle --watch"
+  },
+  "dependencies": {
+    "flipper-plugin-react-native-inspect-json-client": "^0.0.5"
+  },
+  "devDependencies": {
+    "@babel/preset-react": "^7.12.10",
+    "@babel/preset-typescript": "latest",
+    "@types/jest": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "antd": "latest",
+    "flipper": "latest",
+    "flipper-pkg": "latest",
+    "flipper-plugin": "latest",
+    "jest": "latest"
+  },
+  "peerDependencies": {
+    "antd": "latest",
+    "flipper": "latest",
+    "flipper-plugin": "latest"
+  },
+  "icon": "magnifying-glass",
+  "flipperBundlerEntry": "src/index.tsx",
+  "id": "react-native-inspect-json",
+  "title": "Inspect JSON"
+}

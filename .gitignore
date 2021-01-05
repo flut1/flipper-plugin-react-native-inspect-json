@@ -1,9 +1,0 @@
-# shared with .npmignore
-node_modules
-.idea
-
-# .gitignore only
-dist/
-lib/*.d.ts
-lib/*.js
-lib/*.js.map
