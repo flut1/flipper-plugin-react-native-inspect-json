@@ -84,7 +84,7 @@ const SubTreeLineLeft = styled.div`
   height: auto;
   width: 1px;
   top: 0;
-  bottom: 14px;
+  bottom: 11px;
 `;
 
 const SubTreeEl: FunctionComponent<{ className?: string, hasAppeared?: boolean, isRoot?: boolean }> =
@@ -97,34 +97,10 @@ const SubTreeEl: FunctionComponent<{ className?: string, hasAppeared?: boolean, 
 
 export const SubTree = styled(SubTreeEl)`
   margin-left: ${({ isRoot }) => isRoot ? 0.4 : 1.6}rem;
-  margin-bottom: 1rem;
   position: relative;
   overflow: hidden;
   
   animation: ${({ hasAppeared }) => hasAppeared ? appear : 'none'} 0.3s ease-out backwards;
-`;
-
-const ObjectIndicatorWrapper: FunctionComponent<{className?: string, characters: string}> = ({ className, children }) => (
-    <div className={className}>
-        <span>{children}</span>
-    </div>
-);
-
-export const ObjectIndicator = styled(ObjectIndicatorWrapper)`
-  display: inline-block;
-  span {
-      display: inline-block;
-      min-width: 1.5rem;
-      text-align: center;
-  }
-  
-  &:before {
-    content: '${({ characters }) => characters[0]}';
-  }
-  
-  &:after {
-    content: '${({ characters }) => characters[1]}';
-  }
 `;
 
 export const ContentWrapper = styled.div`
@@ -136,8 +112,7 @@ export const ContentWrapper = styled.div`
 export const Type = styled.div`
   flex: 0 0 auto;
   color: #999;
-  padding: 5px 5px 5px 0;
-  min-width: 3rem;
+  padding: 5px 5px 5px 10px;
   text-align: left;
 `;
 
@@ -171,8 +146,8 @@ const flash2 = keyframes`
 const ValueWrapper = styled.div`
   flex: 0 1 auto;
   overflow: hidden;
-  padding: 5px 5px;
-  margin: 0 5px;
+  padding: 5px;
+  margin: 0;
   text-overflow: ellipsis;
   box-sizing: border-box;
   white-space: nowrap;

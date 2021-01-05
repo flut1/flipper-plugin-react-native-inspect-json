@@ -1,9 +1,8 @@
 import React, {FunctionComponent, useState, useRef, useEffect} from "react";
 import {usePlugin, useValue} from "flipper-plugin";
-import {CaretRightFilled} from "@ant-design/icons";
 import {message} from "antd";
 import type {StateValue} from "flipper-plugin-react-native-inspect-json-client";
-import {TreeRow, SubTree, Type, Value, Name, ObjectIndicator, Label} from "./uiComponents";
+import {TreeRow, SubTree, Type, Value, Name, Label} from "./uiComponents";
 import plugin from './plugin';
 
 interface Props {
@@ -11,13 +10,6 @@ interface Props {
     name: string;
     isExpanded: boolean;
     onClick?: () => void;
-}
-
-const SHORT_TYPES = {
-    boolean: 'bool',
-    string: 'string',
-    function: 'func',
-    number: 'num'
 }
 
 const Labels: FunctionComponent<{ value: StateValue }> = ({
@@ -59,8 +51,8 @@ const DataTreeValue: FunctionComponent<Props> = ({ value, name, isExpanded, onCl
         case "function":
             return (
                 <TreeRow isExpanded={isExpanded}>
-                    <Type>{SHORT_TYPES.function}</Type>
                     { name && <Name>{name}</Name> }
+                    <Type>fn()</Type>
                     <Value type={value.type}>{value.code}</Value>
                     <Labels value={value} />
                 </TreeRow>
@@ -85,8 +77,8 @@ const DataTreeValue: FunctionComponent<Props> = ({ value, name, isExpanded, onCl
         case "boolean":
             return (
                 <TreeRow isExpanded={isExpanded}>
-                    <Type>{ SHORT_TYPES[value.type] }</Type>
                     { name && <Name>{name}</Name> }
+                    <Type>{value.type}</Type>
                     <Value type={value.type} onClick={() => copyValue(value.value.toString())}>
                         { JSON.stringify(value.value) }
                     </Value>
@@ -97,10 +89,10 @@ const DataTreeValue: FunctionComponent<Props> = ({ value, name, isExpanded, onCl
             return (
                 <>
                     <TreeRow isExpanded={isExpanded} onClick={onClick}>
-                        <Type>
-                            <ObjectIndicator characters="[]">{value.length}</ObjectIndicator>
-                        </Type>
                         {name && <Name>{name}</Name>}
+                        <Type>
+                            array {`[${value.length}]`}
+                        </Type>
                         <Labels value={value} />
                     </TreeRow>
 
@@ -115,10 +107,10 @@ const DataTreeValue: FunctionComponent<Props> = ({ value, name, isExpanded, onCl
             return (
                 <>
                     <TreeRow isExpanded={isExpanded} onClick={onClick}>
-                        <Type>
-                            <ObjectIndicator characters="{}">{value.numKeys}</ObjectIndicator>
-                        </Type>
                         {name && <Name>{name}</Name>}
+                        <Type>
+                            object {`{${value.numKeys}}`}
+                        </Type>
                         <Labels value={value} />
                     </TreeRow>
 
