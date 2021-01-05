@@ -5,8 +5,8 @@ that are too large to continuously sync with Flipper desktop. Instead, this plug
 object which have been expanded in the tree view in Flipper. 
 
 The plugin has been created for usage with a global MobX store, of which you can find an example below. However, it should
-also work with other kinds of objects. Keep in mind that this plugin does not track changes to the object and send
-updates to Flipper accordingly. You would have to implement your own change tracking that calls `updateState()`.
+also work with other kinds of objects. Keep in mind that this plugin does not track changes to the object. If you don't
+use MobX, you would have to implement your own change tracking that calls `updateState()`.
 
 ## Installation
 In Flipper:
@@ -57,7 +57,7 @@ function storeFlipperPlugin(store: Store) {
                     /* when that description changes, send it to Flipper */
                     (segment) => {
                         if (segment) {
-                            plugin.updateSegment(subscription, segment);
+						    plugin.updateSegment(subscription, segment || null);
                         }
                     },
                     {
@@ -65,6 +65,7 @@ function storeFlipperPlugin(store: Store) {
                         equals: comparer.structural,
                         /* send it once immediately */
                         fireImmediately: true,
+						delay: 100,
                     }
                 );
             }
