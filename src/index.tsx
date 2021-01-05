@@ -10,7 +10,8 @@ export function plugin(client: PluginClient<Events, Methods>) {
     const persistentData = createState<PersistentData>({
         subscriptions: ['.'],
         showHidden: false,
-        showLabels: true,
+        hiddenLabels: [],
+        labels: [],
     }, {persist: `data_${client.appId}`});
     const localState = createState<LocalState>({
         data: {},
@@ -26,6 +27,23 @@ export function plugin(client: PluginClient<Events, Methods>) {
         client.onMessage('updateSegment', ({ path, segment }) => {
             localState.update(draft => {
                 draft.data[path] = segment;
+            });
+
+            const values = segment.type === 'array' ? segment.values : Object.values(segment.values);
+            const labels = new Set<string>();
+            for (const value of values) {
+                if (value.labels) {
+                    for (const label of value.labels) {
+                        labels.add(label);
+                    }
+                }
+            }
+            persistentData.update(draft => {
+                for (const label of labels.values()) {
+                    if (!draft.labels.includes(label)) {
+                        draft.labels.push(label);
+                    }
+                }
             });
         });
         client.onMessage('init', () => {
@@ -51,9 +69,14 @@ export function plugin(client: PluginClient<Events, Methods>) {
     return {
         localState,
         persistentData,
-        toggleOption(option: keyof RuntimeOptions) {
+        toggleOption(option: 'showHidden') {
             persistentData.update(draft => {
                 draft[option] = !draft[option];
+            });
+        },
+        setVisibleLabels(labels: Array<string>) {
+            persistentData.update(draft => {
+                draft.hiddenLabels = draft.labels.filter(label => !labels.includes(label));
             });
         },
         reset() {
@@ -62,6 +85,7 @@ export function plugin(client: PluginClient<Events, Methods>) {
             });
             persistentData.update(draft => {
                 draft.subscriptions = ['.'];
+                draft.labels = [];
             });
             sendSubscriptions();
         },

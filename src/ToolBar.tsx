@@ -1,28 +1,62 @@
-import React, {FunctionComponent, useState, useRef, useEffect} from "react";
+import React, {FunctionComponent} from "react";
 import {styled, theme, useValue, usePlugin} from "flipper-plugin";
-import {Checkbox} from "antd";
-import {ResetButton} from "./uiComponents";
+import {Select, Button, Switch} from "antd";
 import {plugin} from "./index";
 
 const ToolbarWrapper = styled.div`
-    height: 42px;
-    display: flex;
-    padding: 0 15px;
-    align-items: center;
-    line-height: 32px;
+    min-height: 42px;
     background: ${theme.backgroundDefault};
     border-bottom: 1px solid ${theme.dividerColor};
+    padding: 0 15px;
+    flex-wrap: wrap;
+    align-items: center;
+    display: flex;
+    line-height: 32px;
+`;
+
+const ToolbarDivider = styled.div`
+  flex: 0 0 1px;
+  margin: 0 10px;
+  height: 42px;
+  border-right: 1px solid ${theme.dividerColor};
+`;
+
+const LabelSelect = styled(Select)`
+  flex: 0 0 300px;
+  margin-right: 10px;
 `;
 
 const Toolbar: FunctionComponent = () => {
     const instance = usePlugin(plugin);
-    const { showHidden, showLabels } = useValue(instance.persistentData);
+    const { showHidden, hiddenLabels, labels } = useValue(instance.persistentData);
+
+    const toggleHidden = () => instance.toggleOption('showHidden');
 
     return (
         <ToolbarWrapper>
-            <Checkbox checked={showLabels} onClick={() => instance.toggleOption('showLabels')}>show labels</Checkbox>
-            <Checkbox checked={showHidden} onClick={() => instance.toggleOption('showHidden')}>show hidden properties</Checkbox>
-            <ResetButton size="small" onClick={instance.reset}>force reset</ResetButton>
+            <span style={{ paddingRight: 10, cursor: "pointer" }} onClick={toggleHidden}>show hidden properties:</span>
+            <Switch
+                size="small"
+                checked={showHidden}
+                onClick={toggleHidden}
+            />
+            <ToolbarDivider />
+
+            <span style={{ marginRight: 10 }}>show labels:</span>
+            <LabelSelect
+                mode="multiple"
+                allowClear
+                placeholder="no labels visible"
+                value={labels.filter(label => !hiddenLabels.includes(label))}
+                onChange={instance.setVisibleLabels as any}
+                maxTagCount={2}
+            >
+                {labels.map((label, index) => (
+                    <Select.Option key={index} value={label}>{ label }</Select.Option>
+                ))}
+            </LabelSelect>
+            <ToolbarDivider />
+            <Button size="small" onClick={instance.reset}>force reset</Button>
         </ToolbarWrapper>
     )
 };

@@ -2,7 +2,8 @@ import {Subscriptions, State, StateSegment} from "../lib/types";
 
 export type RuntimeOptions = {
     showHidden: boolean;
-    showLabels: boolean;
+    hiddenLabels: Array<string>;
+    labels: Array<string>;
 }
 
 export type PersistentData = RuntimeOptions & {

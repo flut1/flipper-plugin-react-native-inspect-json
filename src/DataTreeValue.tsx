@@ -3,6 +3,7 @@ import {StateValue} from "../lib/types";
 import {TreeRow, SubTree, Type, Value, Name, ObjectIndicator, Label} from "./uiComponents";
 import {usePlugin, useValue} from "flipper-plugin";
 import {plugin} from "./index";
+import {message} from "antd";
 
 interface Props {
     value: StateValue;
@@ -22,22 +23,26 @@ const Labels: FunctionComponent<{ value: StateValue }> = ({
   value: { labels = [] }
 }) => {
     const { persistentData } = usePlugin(plugin);
-    const { showLabels } = useValue(persistentData);
-
-    if (!showLabels) {
-        return null;
-    }
+    const { hiddenLabels } = useValue(persistentData);
 
     return (
         <>
             {
-                labels.map((label, index) => (
+                labels.filter(label => !hiddenLabels.includes(label)).map((label, index) => (
                     <Label mark key={index}>{label}</Label>
                 ))
             }
         </>
     );
 };
+
+const copyValue = (value: string) => {
+    navigator.clipboard.writeText(value).then(() => {
+        message.success('value copied to clipboard');
+    }).catch(() => {
+        console.log('Failed to copy to clipboard');
+    });
+}
 
 const DataTreeValue: FunctionComponent<Props> = ({ value, name, isExpanded, onClick, children }) => {
     const [hasExpanded, setHasExpanded] = useState(false);
@@ -81,7 +86,9 @@ const DataTreeValue: FunctionComponent<Props> = ({ value, name, isExpanded, onCl
                 <TreeRow isExpanded={isExpanded}>
                     <Type>{ SHORT_TYPES[value.type] }</Type>
                     { name && <Name>{name}</Name> }
-                    <Value type={value.type}>{ JSON.stringify(value.value) }</Value>
+                    <Value type={value.type} onClick={() => copyValue(value.value.toString())}>
+                        { JSON.stringify(value.value) }
+                    </Value>
                     <Labels value={value} />
                 </TreeRow>
             );

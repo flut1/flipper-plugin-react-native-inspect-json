@@ -1,11 +1,7 @@
 import React, {FunctionComponent} from 'react';
 import {keyframes} from '@emotion/react';
 import {styled, theme} from 'flipper-plugin';
-import {Button, Typography} from "antd";
-
-export const ResetButton = styled(Button)`
-  margin-left: 1rem;
-`
+import {Typography} from "antd";
 
 export const TreeRowWrapper = styled.div`
   margin: 0;
@@ -13,11 +9,16 @@ export const TreeRowWrapper = styled.div`
   justify-content: flex-start;
   padding: 0;
   cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
-  background: none;
   border: none;
   text-align: left;
   width: 100%;
   align-items: flex-start;
+  transition: background-color 0.2s ease-out;
+  background-color: transparent;
+  
+  &:hover {
+    background-color: ${theme.backgroundWash};
+  }
 `;
 
 export const ExpandIndicator = styled.div`
@@ -109,16 +110,6 @@ export const ContentWrapper = styled.div`
   width: 100%;
 `;
 
-const ValueWrapper = styled.div`
-  flex: 0 1 auto;
-  overflow: hidden;
-  padding: 5px 0;
-  margin: 0 10px;
-  text-overflow: ellipsis;
-  box-sizing: border-box;
-  white-space: nowrap;
-`;
-
 export const Type = styled.div`
   flex: 0 0 auto;
   color: #999;
@@ -137,9 +128,30 @@ export const Label = styled(Typography.Text)`
   padding: 5px;
 `;
 
+const ValueWrapper = styled.div`
+  flex: 0 1 auto;
+  overflow: hidden;
+  padding: 5px 0;
+  margin: 0 10px;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+  white-space: nowrap;
+  transition: background-color 0.2s ease-out;
+  background-color: transparent;
+  border: none;
+  display: block;
+  appearance: none;
+  cursor: ${(props) => props.onClick ? 'pointer' : 'default'};
+  
+  &:hover {
+    background-color: ${(props) => props.onClick ? theme.backgroundTransparentHover : 'transparent'};
+  }
+`;
+
 export const Value: FunctionComponent<{
-    type: 'boolean' | 'string' | 'number' | 'null' | 'function' | 'undefined'
-}> = ({ children, type }) => {
+    type: 'boolean' | 'string' | 'number' | 'null' | 'function' | 'undefined',
+    onClick?: () => any,
+}> = ({ children, type, onClick }) => {
     let color: string = '#000';
     switch (type) {
         case "boolean":
@@ -159,7 +171,7 @@ export const Value: FunctionComponent<{
     }
 
     return (
-        <ValueWrapper style={{color}}>
+        <ValueWrapper as={onClick ? 'button' : undefined} style={{color}} onClick={onClick}>
             {children}
         </ValueWrapper>
     );
