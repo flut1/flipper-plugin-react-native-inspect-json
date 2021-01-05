@@ -13,6 +13,10 @@
   "files": [
     "src/index.tsx",
     "src/DataTree.tsx",
+    "src/DataTreeValue.tsx",
+    "src/desktopTypes.ts",
+    "src/plugin.ts",
+    "src/ToolBar.tsx",
     "src/uiComponents.tsx"
   ]
 }

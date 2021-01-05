@@ -11,8 +11,11 @@ updates to Flipper accordingly. You would have to implement your own change trac
 ## Installation
 In Flipper:
 
-- Open Flipper
-- 
+* Open Flipper
+* Goto "manage plugins"
+* Search for "react-native-inspect-json"
+* Hit "install" on the plugin
+* Restart
 
 In your react-native app:
 
