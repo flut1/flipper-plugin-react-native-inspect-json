@@ -1,4 +1,4 @@
-import React, {FunctionComponent} from 'react';
+import React, {FunctionComponent, useState, useEffect} from 'react';
 import {keyframes} from '@emotion/react';
 import {styled, theme} from 'flipper-plugin';
 import {Typography} from "antd";
@@ -128,11 +128,28 @@ export const Label = styled(Typography.Text)`
   padding: 5px;
 `;
 
+const flash = keyframes`
+  0% {
+    background-color: #F66E6E;
+  }
+  100% {
+    background-color: transparent;
+  }
+`;
+const flash2 = keyframes`
+  0% {
+    background-color: #F66E6F;
+  }
+  100% {
+    background-color: transparent;
+  }
+`;
+
 const ValueWrapper = styled.div`
   flex: 0 1 auto;
   overflow: hidden;
-  padding: 5px 0;
-  margin: 0 10px;
+  padding: 5px 5px;
+  margin: 0 5px;
   text-overflow: ellipsis;
   box-sizing: border-box;
   white-space: nowrap;
@@ -143,6 +160,14 @@ const ValueWrapper = styled.div`
   appearance: none;
   cursor: ${(props) => props.onClick ? 'pointer' : 'default'};
   
+  &.changed1 {
+    animation: ${flash} 0.3s ease-out both;
+  }
+  
+  &.changed2 {
+    animation: ${flash2} 0.3s ease-out both;
+  }
+  
   &:hover {
     background-color: ${(props) => props.onClick ? theme.backgroundTransparentHover : 'transparent'};
   }
@@ -151,7 +176,18 @@ const ValueWrapper = styled.div`
 export const Value: FunctionComponent<{
     type: 'boolean' | 'string' | 'number' | 'null' | 'function' | 'undefined',
     onClick?: () => any,
+    children: string | boolean | number
 }> = ({ children, type, onClick }) => {
+    const [changedFlag, setChangedFlag] = useState('');
+    const [valueCache, setValueCache] = useState(children);
+
+    useEffect(() => {
+        if (children !== valueCache) {
+            setValueCache(children);
+            setChangedFlag(changedFlag === 'changed1' ? 'changed2' : 'changed1');
+        }
+    }, [children]);
+
     let color: string = '#000';
     switch (type) {
         case "boolean":
@@ -171,7 +207,12 @@ export const Value: FunctionComponent<{
     }
 
     return (
-        <ValueWrapper as={onClick ? 'button' : undefined} style={{color}} onClick={onClick}>
+        <ValueWrapper
+            as={onClick ? 'button' : undefined}
+            style={{color}}
+            onClick={onClick}
+            className={changedFlag}
+        >
             {children}
         </ValueWrapper>
     );
