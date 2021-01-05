@@ -94,7 +94,7 @@ export default class PluginClient {
         }
     }
 
-    private sendSegment(subscription: Subscription, segment: StateSegment) {
+    private sendSegment(subscription: Subscription, segment: StateSegment | null) {
         this.send('updateSegment', { path: subscription, segment });
     }
 }

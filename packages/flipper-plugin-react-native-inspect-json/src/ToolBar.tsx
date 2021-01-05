@@ -21,7 +21,7 @@ const ToolbarDivider = styled.div`
   border-right: 1px solid ${theme.dividerColor};
 `;
 
-const LabelSelect = styled(Select)`
+const LabelSelectWrapper = styled.div`
   flex: 0 0 300px;
   margin-right: 10px;
 `;
@@ -43,18 +43,23 @@ const Toolbar: FunctionComponent = () => {
             <ToolbarDivider />
 
             <span style={{ marginRight: 10 }}>show labels:</span>
-            <LabelSelect
-                mode="multiple"
-                allowClear
-                placeholder="no labels visible"
-                value={labels.filter(label => !hiddenLabels.includes(label))}
-                onChange={instance.setVisibleLabels as any}
-                maxTagCount={2}
-            >
-                {labels.map((label, index) => (
-                    <Select.Option key={index} value={label}>{ label }</Select.Option>
-                ))}
-            </LabelSelect>
+            <LabelSelectWrapper>
+                {
+                    <Select
+                        mode="multiple"
+                        allowClear
+                        style={{ minWidth: 300 }}
+                        placeholder="no labels visible"
+                        value={labels.filter(label => !hiddenLabels.includes(label))}
+                        onChange={instance.setVisibleLabels as any}
+                        maxTagCount={2}
+                    >
+                        {labels.map((label, index) => (
+                            <Select.Option key={index} value={label}>{ label }</Select.Option>
+                        ))}
+                    </Select>
+                }
+            </LabelSelectWrapper>
             <ToolbarDivider />
             <Button size="small" onClick={instance.reset}>force reset</Button>
         </ToolbarWrapper>

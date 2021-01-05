@@ -20,6 +20,21 @@ export default function plugin(client: PluginClient<Events, Methods>) {
 
     client.onConnect(() => {
         client.onMessage('updateSegment', ({ path, segment }) => {
+            if (!segment) {
+                localState.update(draft => {
+                    delete draft.data[path];
+                });
+
+                persistentData.update(draft => {
+                    const subscriptionIndex = draft.subscriptions.indexOf(path);
+                    if (subscriptionIndex >= 0) {
+                        draft.subscriptions.splice(subscriptionIndex, 1);
+                    }
+                });
+
+                return;
+            }
+
             localState.update(draft => {
                 draft.data[path] = segment;
             });

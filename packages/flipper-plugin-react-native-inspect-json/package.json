@@ -34,21 +34,23 @@
   "devDependencies": {
     "@babel/preset-react": "^7.12.10",
     "@babel/preset-typescript": "latest",
+    "@emotion/react": "^11.0.0",
     "@types/jest": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "antd": "latest",
+    "antd": "4.9.4",
     "flipper": "latest",
     "flipper-pkg": "latest",
     "flipper-plugin": "latest",
     "jest": "latest"
   },
   "peerDependencies": {
-    "antd": "latest",
+    "@emotion/react": "^11.0.0",
+    "antd": "4.9.4",
     "flipper": "latest",
     "flipper-plugin": "latest"
   },
-  "icon": "magnifying-glass",
+  "icon": "tree",
   "flipperBundlerEntry": "src/index.tsx",
   "id": "react-native-inspect-json",
   "title": "Inspect JSON"

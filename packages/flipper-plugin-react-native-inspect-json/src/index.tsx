@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Alert} from "antd";
 import {usePlugin, useValue, Layout} from 'flipper-plugin';
 import DataTree from "./DataTree";

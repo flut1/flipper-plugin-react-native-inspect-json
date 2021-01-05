@@ -4,14 +4,15 @@ import {styled, theme} from 'flipper-plugin';
 import {Typography} from "antd";
 
 export const TreeRowWrapper = styled.div`
-  margin: 0;
+  margin: 0 0 0 1rem;
   display: flex;
   justify-content: flex-start;
-  padding: 0;
+  padding: 0 0 0 5px;
   cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
   border: none;
   text-align: left;
   width: 100%;
+  position: relative;
   align-items: flex-start;
   transition: background-color 0.2s ease-out;
   background-color: transparent;
@@ -30,11 +31,13 @@ export const ExpandIndicator = styled.div`
 `;
 
 export const RowLine = styled.div`
-  flex: 0 0 1rem;
+  position: absolute;
+  bottom: 50%;
+  right: 100%;
+  width: 1rem;
   height: 1px;
   border-bottom: 1px dashed #CCC;
   align-self: center;
-  margin-right: 5px;
 `
 
 export const TreeRow: FunctionComponent<{

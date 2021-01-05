@@ -16,7 +16,7 @@ export type LocalState = {
 }
 
 export type Events = {
-    updateSegment: { path: string, segment: StateSegment };
+    updateSegment: { path: string, segment: StateSegment | null };
     init: { hello: string };
 };
 
