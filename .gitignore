@@ -1,4 +1,7 @@
+# shared with .npmignore
 node_modules
+
+# .gitignore only
 dist/
 lib/*.d.ts
 lib/*.js

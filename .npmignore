@@ -1,0 +1,6 @@
+# shared with .gitignore
+node_modules
+
+# .npmignore only
+lib/*.ts
+src/__tests__
