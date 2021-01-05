@@ -1,6 +1,12 @@
 # shared with .gitignore
 node_modules
+.idea
 
 # .npmignore only
 lib/*.ts
+!lib/*.d.ts
 src/__tests__
+src
+tsconfig.lib.json
+tsconfig.json
+babel.config.js

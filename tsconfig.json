@@ -10,13 +10,11 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
+  "include": [
+    "src/*.ts",
+    "src/*.tsx"
+  ],
   "files": [
-    "src/index.tsx",
-    "src/DataTree.tsx",
-    "src/DataTreeValue.tsx",
-    "src/desktopTypes.ts",
-    "src/plugin.ts",
-    "src/ToolBar.tsx",
-    "src/uiComponents.tsx"
+    "src/index.tsx"
   ]
 }

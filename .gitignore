@@ -1,5 +1,6 @@
 # shared with .npmignore
 node_modules
+.idea
 
 # .gitignore only
 dist/

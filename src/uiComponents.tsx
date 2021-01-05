@@ -1,5 +1,5 @@
 import React, {FunctionComponent, useState, useEffect} from 'react';
-import {keyframes} from '@emotion/react';
+import {keyframes} from 'flipper';
 import {styled, theme} from 'flipper-plugin';
 import {Typography} from "antd";
 

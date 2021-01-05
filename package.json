@@ -35,7 +35,7 @@
     "object.fromentries": "^2.0.3"
   },
   "devDependencies": {
-    "@babel/preset-react": "latest",
+    "@babel/preset-react": "^7.12.10",
     "@babel/preset-typescript": "latest",
     "@types/jest": "latest",
     "@types/lodash.debounce": "^4.0.6",
