@@ -2,12 +2,13 @@ import React, {FunctionComponent, useState, useEffect} from 'react';
 import {keyframes} from 'flipper';
 import {styled, theme} from 'flipper-plugin';
 import {Typography} from "antd";
+import {CaretRightFilled} from "@ant-design/icons";
 
 export const TreeRowWrapper = styled.div`
   margin: 0 0 0 1rem;
   display: flex;
   justify-content: flex-start;
-  padding: 0 0 0 5px;
+  padding: 0 0 0 3px;
   cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
   border: none;
   text-align: left;
@@ -22,14 +23,6 @@ export const TreeRowWrapper = styled.div`
   }
 `;
 
-export const ExpandIndicator = styled.div`
-  flex: 0 0 auto;
-  margin-left: 5px;
-  padding-top: 4px;
-  color: #3d35a2;
-  margin-right: auto;
-`;
-
 export const RowLine = styled.div`
   position: absolute;
   bottom: 50%;
@@ -38,7 +31,19 @@ export const RowLine = styled.div`
   height: 1px;
   border-bottom: 1px dashed #CCC;
   align-self: center;
-`
+`;
+
+const ExpandIndicator = styled(CaretRightFilled)`
+  position: relative;
+  top: 4px;
+  color: ${theme.textColorSecondary};
+  margin-right: 2px;
+  
+  svg {
+      transform-origin: 50% 50%;
+      transition: transform 0.2s ease-out;
+  }
+`;
 
 export const TreeRow: FunctionComponent<{
     isExpanded?: boolean,
@@ -56,9 +61,9 @@ export const TreeRow: FunctionComponent<{
         <TreeRowWrapper as={isExpandable ? 'button' : 'div'} onClick={onClick}>
             { !isRoot && <RowLine /> }
 
-            {children}
+            { isExpandable && <ExpandIndicator rotate={isExpanded ? 90 : 0} /> }
 
-            { isExpandable && <ExpandIndicator>{isExpanded ? '-' : '+'}</ExpandIndicator>}
+            {children}
         </TreeRowWrapper>
     );
 };
@@ -72,13 +77,28 @@ const appear = keyframes`
   }
 `;
 
+const SubTreeLineLeft = styled.div`
+  border-left: 1px dashed #ccc;
+  left: 0;
+  position: absolute;
+  height: auto;
+  width: 1px;
+  top: 0;
+  bottom: 14px;
+`;
+
 const SubTreeEl: FunctionComponent<{ className?: string, hasAppeared?: boolean, isRoot?: boolean }> =
-    ({ className, children }) => <div className={className}>{children}</div>;
+    ({ className, children }) => (
+        <div className={className}>
+            <SubTreeLineLeft />
+            {children}
+        </div>
+    );
 
 export const SubTree = styled(SubTreeEl)`
-  margin-left: ${({ isRoot }) => isRoot ? 1.2 : 2.4}rem;
+  margin-left: ${({ isRoot }) => isRoot ? 0.4 : 1.6}rem;
   margin-bottom: 1rem;
-  border-left: 1px dashed #ccc;
+  position: relative;
   overflow: hidden;
   
   animation: ${({ hasAppeared }) => hasAppeared ? appear : 'none'} 0.3s ease-out backwards;

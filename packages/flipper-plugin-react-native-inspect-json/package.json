@@ -29,6 +29,7 @@
     "watch": "flipper-pkg bundle --watch"
   },
   "dependencies": {
+    "@ant-design/icons": "^4.3.0",
     "flipper-plugin-react-native-inspect-json-client": "^0.0.6"
   },
   "devDependencies": {

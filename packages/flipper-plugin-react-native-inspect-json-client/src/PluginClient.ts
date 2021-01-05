@@ -11,7 +11,7 @@ type OnConnectCallback = (subscriptions: Subscriptions | null) => any;
 type OnDisconnectCallback = () => any;
 
 export default class PluginClient {
-    private debouncedSend: Record<Subscription, (newValue: StateSegment) => void> = {};
+    private debouncedSend: Record<Subscription, (newValue: StateSegment | null) => void> = {};
     private $subscriptions: Subscriptions | null = null;
     private options: Options;
     private connection: Flipper.FlipperConnection | null = null;
@@ -73,14 +73,14 @@ export default class PluginClient {
         return this.$subscriptions;
     }
 
-    public updateSegment(subscription: Subscription, segment: StateSegment, immediate = false) {
+    public updateSegment(subscription: Subscription, segment: StateSegment | null, immediate = false) {
         if (immediate) {
             return this.sendSegment(subscription, segment);
         }
 
         if (!this.debouncedSend[subscription]) {
             this.debouncedSend[subscription] = debounce(
-                (newValue: StateSegment) => this.sendSegment(subscription, newValue),
+                (newValue: StateSegment | null) => this.sendSegment(subscription, newValue),
                 SEND_SEGMENT_DEBOUNCE,
                 { maxWait: SEND_SEGMENT_MAX_WAIT }
             );

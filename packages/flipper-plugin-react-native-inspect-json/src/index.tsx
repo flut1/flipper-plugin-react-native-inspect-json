@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import {Alert} from "antd";
 import {usePlugin, useValue, Layout} from 'flipper-plugin';
 import DataTree from "./DataTree";
-import {ContentWrapper, TreeRow, Name, SubTree} from "./uiComponents";
+import {ContentWrapper, SubTree} from "./uiComponents";
 import Toolbar from "./ToolBar";
 import plugin_ from './plugin';
 
@@ -30,9 +30,6 @@ export function Component() {
                     }
                     { data['.'] && (
                         <>
-                            <TreeRow isRoot isExpanded>
-                                <Name>data</Name>
-                            </TreeRow>
                             <SubTree isRoot>
                                 <DataTree
                                     state={data}

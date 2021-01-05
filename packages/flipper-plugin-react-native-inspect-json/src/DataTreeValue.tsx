@@ -1,5 +1,6 @@
 import React, {FunctionComponent, useState, useRef, useEffect} from "react";
 import {usePlugin, useValue} from "flipper-plugin";
+import {CaretRightFilled} from "@ant-design/icons";
 import {message} from "antd";
 import type {StateValue} from "flipper-plugin-react-native-inspect-json-client";
 import {TreeRow, SubTree, Type, Value, Name, ObjectIndicator, Label} from "./uiComponents";
