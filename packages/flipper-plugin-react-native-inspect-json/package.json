@@ -1,7 +1,7 @@
 {
   "$schema": "https://fbflipper.com/schemas/plugin-package/v2.json",
   "name": "flipper-plugin-react-native-inspect-json",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "keywords": [
     "flipper-plugin",
     "react-native",
