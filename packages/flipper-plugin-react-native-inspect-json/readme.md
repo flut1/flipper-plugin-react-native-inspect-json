@@ -9,7 +9,7 @@ also work with other kinds of objects. Keep in mind that this plugin does not tr
 use MobX, you would have to implement your own change tracking that calls `updateState()`.
 
 ## Compatibility 
-This plugin has been tested with Flipper and `react-native-flipper` 0.69.0
+This plugin has been tested with Flipper and `react-native-flipper` 0.75.0
 
 ## Installation
 In Flipper:

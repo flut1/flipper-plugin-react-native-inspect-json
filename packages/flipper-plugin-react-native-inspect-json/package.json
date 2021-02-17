@@ -40,9 +40,9 @@
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "antd": "4.9.4",
-    "flipper": "latest",
-    "flipper-pkg": "latest",
-    "flipper-plugin": "latest",
+    "flipper": "^0.75.1",
+    "flipper-pkg": "^0.75.1",
+    "flipper-plugin": "^0.75.1",
     "jest": "latest"
   },
   "peerDependencies": {
